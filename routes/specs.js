@@ -98,6 +98,11 @@ router.post("/specsdelete", async (req, res) => {
             data = await Db.select(req, `SELECT a.*,
 (SELECT GROUP_CONCAT(b.specsval) FROM ${tableNameAttr} b WHERE a.id = b.specsid) attrs
 from ${tableName} a`);
+
+            data.map(item=>{
+                item.attrs = item.attrs.split(',')
+            })
+
             res.send(Success(data))
         }else{
             res.send(MError());
