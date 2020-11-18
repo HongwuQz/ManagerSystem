@@ -5,7 +5,7 @@ exports.dbConfig = {
     user: 'root',
     password: '',
     port: 3306,
-    database: 'shop_db' // 数据库名字
+    database: 'kml_db' // 数据库名字
 }
 
 // token过期时间 (分钟单位)
