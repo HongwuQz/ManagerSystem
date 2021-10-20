@@ -1,12 +1,12 @@
 <template>
-  <div class="admin">
-      <h1>管理员管理页面</h1>
+  <div class="home">
+      <h1>Welcome</h1>
   </div>
 </template>
 
 <script>
 export default {
-    name: 'admin'
+    name: 'home'
 }
 </script>
 

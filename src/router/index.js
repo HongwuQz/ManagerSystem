@@ -6,7 +6,26 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    component: () => import('../components/Layout.vue')
+    component: () => import('../components/Layout.vue'),
+    redirect: '/home',
+    children:[
+      {
+        path: '/home',
+        component: () => import('../components/pages/home/Index.vue')
+      },
+      {
+        path: '/admin',
+        component: () => import('../components/pages/admin/Index.vue')
+      },
+      {
+        path: '/menu',
+        component: () => import('../components/pages/menu/Index.vue')
+      },
+      {
+        path: '/role',
+        component: () => import('../components/pages/role/Index.vue')
+      }
+    ]
   },
   {
     path:'/login',

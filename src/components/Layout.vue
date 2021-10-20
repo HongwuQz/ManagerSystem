@@ -1,15 +1,30 @@
 <template>
   <div class="layout">
-      <h1>Layout 内容</h1>
+    <el-container>
+        <el-aside width="200px">
+            <nav-menu></nav-menu>
+        </el-aside>
+        <el-container>
+            <el-header>Header</el-header>
+            <el-main>
+                <router-view></router-view>
+            </el-main>
+        </el-container>
+    </el-container>
   </div>
 </template>
 
 <script>
+import navMenu from '../components/views/NavMenu.vue'
 export default {
-    name: 'layout'
+    name: 'layout',
+    components:{navMenu}
 }
 </script>
 
 <style>
+.layout,.el-container{
+    height: 100%;
+}
 
 </style>
