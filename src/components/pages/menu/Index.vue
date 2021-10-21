@@ -1,5 +1,10 @@
 <template>
   <div class="ms-menu">
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>菜单管理</el-breadcrumb-item>
+    </el-breadcrumb>
+    <el-button type="primary" @click="$router.push('/menu/add')" style="margin:10px">添加</el-button>
     <el-table
     :data="menuData.filter(data => !search || data.title.includes(search) || data.icon.toLowerCase().includes(search.toLowerCase()))"
     style="width: 100%"
@@ -43,11 +48,11 @@
       <template slot-scope="scope">
         <el-button
           size="mini"
-          @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+          @click="$router.push('/menu/edit')">编辑</el-button>
         <el-button
           size="mini"
           type="danger"
-          @click="handleDelete(scope.$index, scope.row)">Delete</el-button>
+          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
       </template>
     </el-table-column>
     </el-table>
@@ -72,10 +77,13 @@ export default {
         .get('/api/menulist',{params:{istree:1}})
         .then((res) => {
           this.menuData = res.data.list
-          console.log(this.menuData)
+          // console.log(this.menuData)
         }).catch(err => {
           console.log(err)
         })
+      },
+      handleEdit(index,row){
+        console.log(index,row)
       }
     }
 }

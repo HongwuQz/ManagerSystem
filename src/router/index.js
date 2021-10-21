@@ -22,9 +22,13 @@ const routes = [
         component: () => import('../components/pages/menu/Index.vue')
       },
       {
+        path: '/menu/add',
+        component: () => import('../components/pages/menu/Edit.vue')
+      },
+      {
         path: '/role',
         component: () => import('../components/pages/role/Index.vue')
-      }
+      },
     ]
   },
   {
