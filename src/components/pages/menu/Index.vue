@@ -48,14 +48,24 @@
       <template slot-scope="scope">
         <el-button
           size="mini"
-          @click="$router.push('/menu/edit')">编辑</el-button>
+          @click="handleEdit(scope.row.id)">编辑</el-button>
         <el-button
           size="mini"
           type="danger"
-          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          @click="dialogVisible = true;id = scope.row.id">删除</el-button>
       </template>
     </el-table-column>
     </el-table>
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisible"
+      width="30%">
+      <span>确定删除？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleDelete">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -65,7 +75,9 @@ export default {
     data(){
       return {
         menuData:[],
-        search:''
+        search:'',
+        dialogVisible: false,
+        id:''
       }
     },
     mounted(){
@@ -77,14 +89,41 @@ export default {
         .get('/api/menulist',{params:{istree:1}})
         .then((res) => {
           this.menuData = res.data.list
-          // console.log(this.menuData)
         }).catch(err => {
-          console.log(err)
+          this.$message({
+            type: 'error',
+            message: '服务器出错啦',
+            showClose: true,
+            center: true
+          })
         })
       },
-      handleEdit(index,row){
-        console.log(index,row)
-      }
+      handleEdit(index){
+        this.$router.push('/menu/' + index)
+      },
+      handleDelete(){
+        this.dialogVisible = false
+        this.$axios
+          .post('/api/menudelete',{id:this.id})
+          .then(res => {
+            this.getMenuList()
+            if (res.data.code == 200) {
+              this.Notification('success',`删除成功`)
+            }
+          }).catch(err => {
+            this.$message.error(err)
+          })
+      },
+      // 右侧弹出提示框
+      Notification (type,title) {
+        this.$notify({
+          title: title,
+          type: type,
+          offset: 100,
+          showClose: false,
+          duration: 1500
+        });
+      },
     }
 }
 </script>

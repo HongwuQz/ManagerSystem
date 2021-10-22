@@ -4,7 +4,7 @@
         <el-breadcrumb separator-class="el-icon-arrow-right" style="margin-bottom:10px">
             <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item :to="{ path: '/menu' }">菜单管理</el-breadcrumb-item>
-            <el-breadcrumb-item style="margin-bottom:10px">菜单管理</el-breadcrumb-item>
+            <el-breadcrumb-item style="margin-bottom:10px">菜单{{type}}</el-breadcrumb-item>
         </el-breadcrumb>
         <!-- 添加/修改表单 -->
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -12,38 +12,39 @@
                 <el-input v-model="ruleForm.title"></el-input>
             </el-form-item>
             <el-form-item label="上级菜单" prop="pid">
-                <el-select v-model="ruleForm.pid" placeholder="请选择上级菜单">
-                <el-option label="顶级菜单" :value='0'></el-option>
-                <el-option
-                v-for="m in menuList"
-                :key="m.id"
-                :label="m.title"
-                :value="m.id"></el-option>
-                </el-select>
+              <el-select v-model="ruleForm.pid" placeholder="请选择上级菜单">
+              <el-option label="顶级菜单" :value='0'></el-option>
+              <!-- 过滤掉本身 -->
+              <el-option
+              v-for="m in menuList.filter(item => item.title != ruleForm.title)"
+              :key="m.id"
+              :label="m.title"
+              :value="m.id"></el-option>
+              </el-select>
             </el-form-item>
             <el-form-item label="菜单类型" prop="type">
-                <el-radio-group v-model="ruleForm.type">
-                <el-radio label="1">目录</el-radio>
-                <el-radio label="2">菜单</el-radio>
-                </el-radio-group>
+              <el-radio-group v-model="ruleForm.type">
+              <el-radio :label="1">目录</el-radio>
+              <el-radio :label="2">菜单</el-radio>
+              </el-radio-group>
             </el-form-item>
             <el-form-item v-if="ruleForm.type == 1" label="菜单图标" prop="icon">
-                <el-input v-model="ruleForm.icon"></el-input>
+              <el-input v-model="ruleForm.icon"></el-input>
             </el-form-item>
             <el-form-item v-if="ruleForm.type == 2" label="菜单地址" prop="url">
-                <el-input v-model="ruleForm.url"></el-input>
+              <el-input v-model="ruleForm.url"></el-input>
             </el-form-item>
             <el-form-item label="状态" prop="status">
-                <el-switch
-                v-model="ruleForm.status"
-                :active-value="1"
-                :inactive-value="0"
-                active-color="green"
-                inactive-color="red"></el-switch>
+              <el-switch
+              v-model="ruleForm.status"
+              :active-value="1"
+              :inactive-value="0"
+              active-color="green"
+              inactive-color="red"></el-switch>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
-                <el-button @click="resetForm('ruleForm')">取消</el-button>
+              <el-button type="primary" @click="submitForm('ruleForm')">立即{{confirmContent}}</el-button>
+              <el-button @click="resetForm('ruleForm')">取消</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -61,6 +62,8 @@
           url: '',      // 菜单时赋值
           status: ''    // 状态
         },
+        type:'添加',
+        confirmContent: '添加',
         menuList:[],
         rules: {
           title: [
@@ -83,59 +86,88 @@
       };
     },
     mounted(){
-        this.getMenuList()
+      let id = this.$route.params.id
+      if(id){
+        this.type = '编辑'
+        this.confirmContent = '编辑'
+        this.getMenuInfo(id)
+      }
+      this.getMenuList()
     },
     methods: {
-        submitForm(formName) {
-            this.$refs[formName].validate((valid) => {
-            if (valid) {
-                let str = JSON.stringify(this.ruleForm)
-                let params = JSON.parse(str)
-                const url = '/api/menuadd'
-                this.$axios.post(url,params)
-                .then(res => {
-                    console.log(res)
-                    if (res.data.code == 200) {
-                        this.Notification('success','添加成功')
-                    }
-                }).catch(err =>{
-                    console.log(err)
-                })
-            } else {
-                console.log('error submit!!');
-                return false;
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+        if (valid) {
+          let str = JSON.stringify(this.ruleForm)
+          let params = JSON.parse(str)
+          params.id = this.$route.params.id
+          let url = '/api/menuadd'
+          if(this.type == '编辑') url = '/api/menuedit'
+          this.$axios.post(url,params)
+          .then(res => {
+            if (res.data.code == 200) {
+              this.Notification('success',`${this.type}成功`)
             }
-            });
-        },
-        // 提示框
-        Notification(type,title) {
+            this.$router.go(-1)
+          }).catch(err =>{
+            console.log(err)
+          })
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+        });
+      },
+      // 提示框
+      Notification (type,title) {
         this.$notify({
           title: title,
           type: type,
           offset: 100,
           showClose: false,
-          duration: 1000
+          duration: 1500
         });
       },
-        getMenuList(){
-            this.$axios
-                .get('/api/menulist',{params:{istree:1}})
-                .then((res) => {
-                    this.menuList = res.data.list
-                }).catch(err => {
-                    console.log(err)
-                })
-        },
-        resetForm(formName) {
-            this.$refs[formName].resetFields();
-            this.$router.go(-1)
-        }
-    }
+      // 获取上级菜单
+      getMenuList(){
+        this.$axios
+          .get('/api/menulist',{params:{istree:1}})
+          .then((res) => {
+            this.menuList = res.data.list
+          }).catch(err => {
+            this.$message({
+            type: 'error',
+            message: '服务器出错啦',
+            showClose: true,
+            center: true
+          })
+        })
+      },
+      // 获取单条菜单信息
+      getMenuInfo(id){
+        this.$axios
+          .get('/api/menuinfo',{params:{id}})
+          .then((res) => {
+            this.ruleForm = res.data.list
+          }).catch(err => {
+            this.$message({
+            type: 'error',
+            message: '服务器出错啦',
+            showClose: true,
+            center: true
+            })
+          })
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+        this.$router.go(-1)
+      }
+    },
   }
 </script>
 
 <style>
     .demo-ruleForm{
-        width: 400px;
+      width: 400px;
     }
 </style>
