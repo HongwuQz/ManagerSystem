@@ -70,61 +70,69 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 export default {
-    name: 'ms-menu',
-    data(){
-      return {
-        menuData:[],
-        search:'',
-        dialogVisible: false,
-        id:''
-      }
-    },
-    mounted(){
-      this.getMenuList()
-    },
-    methods:{
-      getMenuList(){
-        this.$axios
-        .get('/api/menulist',{params:{istree:1}})
-        .then((res) => {
-          this.menuData = res.data.list
-        }).catch(err => {
-          this.$message({
-            type: 'error',
-            message: '服务器出错啦',
-            showClose: true,
-            center: true
-          })
-        })
-      },
-      handleEdit(index){
-        this.$router.push('/menu/' + index)
-      },
-      handleDelete(){
-        this.dialogVisible = false
-        this.$axios
-          .post('/api/menudelete',{id:this.id})
-          .then(res => {
-            this.getMenuList()
-            if (res.data.code == 200) {
-              this.Notification('success',`删除成功`)
-            }
-          }).catch(err => {
-            this.$message.error(err)
-          })
-      },
-      // 右侧弹出提示框
-      Notification (type,title) {
-        this.$notify({
-          title: title,
-          type: type,
-          offset: 100,
-          showClose: false,
-          duration: 1500
-        });
-      },
+  name: 'ms-menu',
+  data(){
+    return {
+      menuData:[],
+      search:'',
+      dialogVisible: false,
+      id:''
     }
+  },
+  mounted(){
+    this.getMenuList({istree:1})
+      .then(res => {
+        this.menuData = res.data.list
+      }).catch(err => {
+        console.log(err)
+      })
+  },
+  methods:{
+    // 更换为使用Vuex的Store保存内容
+    ...mapActions(['getMenuList']),
+    // getMenuList(){
+    //   this.$axios
+    //   .get('/api/menulist',{params:{istree:1}})
+    //   .then((res) => {
+    //     this.menuData = res.data.list
+    //   }).catch(err => {
+    //     this.$message({
+    //       type: 'error',
+    //       message: '服务器出错啦',
+    //       showClose: true,
+    //       center: true
+    //     })
+    //   })
+    // },
+    handleEdit(index){
+      this.$router.push('/menu/' + index)
+    },
+    handleDelete(){
+      this.dialogVisible = false
+      this.$axios
+        .post('/api/menudelete',{id:this.id})
+        .then(res => {
+          this.getMenuList()
+          if (res.data.code == 200) {
+            this.Notification('success',`删除成功`)
+          }
+        }).catch(err => {
+          this.$message.error(err)
+        })
+    },
+    // 右侧弹出提示框
+    Notification (type,title) {
+      this.$notify({
+        title: title,
+        type: type,
+        offset: 100,
+        showClose: false,
+        duration: 1500
+      });
+    }
+  }
 }
 </script>
 

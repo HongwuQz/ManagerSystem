@@ -33,6 +33,10 @@ const routes = [
         path: '/role',
         component: () => import('../components/pages/role/Index.vue')
       },
+      {
+        path: '/role/add',
+        component: () => import('../components/pages/role/Index.vue')
+      },
     ]
   },
   {
