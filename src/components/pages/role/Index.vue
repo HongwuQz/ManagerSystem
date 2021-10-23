@@ -4,7 +4,7 @@
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>菜单管理</el-breadcrumb-item>
     </el-breadcrumb>
-    <el-button type="primary" @click="$router.push('/menu/add')" style="margin:10px">添加</el-button>
+    <el-button type="primary" @click="$router.push('/role/add')" style="margin:10px">添加</el-button>
     <el-table
     :data="roleData.filter(data => !search || data.title.includes(search) || data.icon.toLowerCase().includes(search.toLowerCase()))"
     style="width: 100%"
@@ -93,7 +93,7 @@ export default {
     handleDelete(){
       this.dialogVisible = false
       this.$axios
-        .post('/api/menudelete',{id:this.id})
+        .post('/api/roledelete',{id:this.id})
         .then(res => {
           this.getMenuList()
           if (res.data.code == 200) {
@@ -116,7 +116,3 @@ export default {
   }
 }
 </script>
-
-<style>
-
-</style>

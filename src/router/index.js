@@ -35,7 +35,7 @@ const routes = [
       },
       {
         path: '/role/add',
-        component: () => import('../components/pages/role/Index.vue')
+        component: () => import('../components/pages/role/Edit.vue')
       },
     ]
   },

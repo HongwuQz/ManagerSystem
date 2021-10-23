@@ -14,7 +14,7 @@
             <el-form-item label="上级菜单" prop="pid">
               <el-select v-model="ruleForm.pid" placeholder="请选择上级菜单">
               <el-option label="顶级菜单" :value='0'></el-option>
-              <!-- 过滤掉本身 -->
+              <!-- 过滤掉自身（顶级菜单） -->
               <el-option
               v-for="m in menuList.filter(item => item.title != ruleForm.title)"
               :key="m.id"
