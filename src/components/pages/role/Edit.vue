@@ -24,12 +24,14 @@
             :show-checkbox="true"
             :data="menuList"
             :default-checked-keys="roleForm.menus"
+            :expand-on-click-node="isExtendedable"
             ref="menuTree"
             node-key="id"
             :check-strictly="true"
             :check-on-click-node="true"
             >
             </el-tree>
+            <el-checkbox v-model="isExtendedable">列表伸缩</el-checkbox>
         </el-form-item>
             <el-form-item label="状态" prop="status">
               <el-switch
@@ -57,6 +59,7 @@ export default {
         return {
             type:'添加',
             menuList: [],
+            isExtendedable:true,
             defaultProps:{
                 label:"title",
                 children:"children"
@@ -100,7 +103,6 @@ export default {
                     }
                     let params = this.roleForm
                     params['id'] = id
-                    console.log(params)
                     this.$axios.post(url,params)
                     .then( (res,rej) => {
                         if(res.data.code == 200) {
@@ -121,7 +123,6 @@ export default {
             .then(res => {
                 this.roleForm = res.data.list
                 this.roleForm.menus = res.data.list.menus.split(',')
-                console.log(this.roleForm)
             }).catch(err => {
                 console.log(err)
             })
@@ -139,7 +140,3 @@ export default {
     }
 }
 </script>
-
-<style>
-
-</style>

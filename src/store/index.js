@@ -25,7 +25,7 @@ export default new Vuex.Store({
             reject(err)
           })
       })
-    }
+    },
   },
   modules: {
   }
