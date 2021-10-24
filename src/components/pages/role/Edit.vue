@@ -23,6 +23,7 @@
             :props="defaultProps"
             :show-checkbox="true"
             :data="menuList"
+            :default-checked-keys="roleForm.menus"
             ref="menuTree"
             node-key="id"
             :check-strictly="true"
@@ -39,7 +40,7 @@
               inactive-color="red"></el-switch>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="doSubmit('roleForm')">立即{{confirmContent}}</el-button>
+              <el-button type="primary" @click="doSubmit('roleForm')">立即{{type}}</el-button>
               <el-button @click="resetForm('roleForm')">取消</el-button>
             </el-form-item>
     </el-form>
@@ -55,7 +56,6 @@ export default {
     data(){
         return {
             type:'添加',
-            confirmContent:'添加',
             menuList: [],
             defaultProps:{
                 label:"title",
@@ -65,16 +65,20 @@ export default {
                 rolename: [
                     { required: true, message: '请输入角色名称', trigger: 'blur'},
                     { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur'}
-                ]
+                ],
             },
             roleForm: {
                 rolename: '',
-                menus:'',
+                menus:[],
                 status:false,
             }
         }
     },
     mounted(){
+        if(this.$route.params.id){
+            this.type = '编辑'
+            this.getRoleInfo()
+        }
         this.getMenuList({istree:1})
         .then(res => {
             this.menuList = res.data.list
@@ -86,18 +90,40 @@ export default {
         ...mapActions(['getMenuList']),
         // 提交并添加用户
         doSubmit (formName) {
-            this.menus = this.$refs['menuTree'].getCheckedKeys().toString()
+            this.roleForm.menus = this.$refs['menuTree'].getCheckedKeys()
             this.$refs[formName].validate( valid => {
                 if(valid){
+                    let url = '/api/roleadd'
+                    let id = this.$route.params.id
+                    if(id) {
+                        url = '/api/roleedit'
+                    }
                     let params = this.roleForm
-                    this.$axios.post('/api/roleadd',params)
-                    .then( res => {
+                    params['id'] = id
+                    console.log(params)
+                    this.$axios.post(url,params)
+                    .then( (res,rej) => {
                         if(res.data.code == 200) {
-                            this.Notification('success','添加成功')
+                            this.Notification('success',`${this.type}成功`)
                             this.$router.go(-1)
+                        }else{
+                            rej(res)
                         }
+                    }).catch(err => {
+                        console.log(err)
                     })
                 }
+            })
+        },
+        getRoleInfo() {
+            let params = this.$route.params
+            this.$axios('/api/roleinfo',{params})
+            .then(res => {
+                this.roleForm = res.data.list
+                this.roleForm.menus = res.data.list.menus.split(',')
+                console.log(this.roleForm)
+            }).catch(err => {
+                console.log(err)
             })
         },
         // 右侧弹出提示框

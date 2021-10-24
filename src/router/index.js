@@ -37,6 +37,10 @@ const routes = [
         path: '/role/add',
         component: () => import('../components/pages/role/Edit.vue')
       },
+      {
+        path: '/role/:id',
+        component: () => import('../components/pages/role/Edit.vue')
+      },
     ]
   },
   {
