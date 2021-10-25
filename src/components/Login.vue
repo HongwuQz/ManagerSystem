@@ -47,7 +47,8 @@ export default {
             this.getLoginInfo(this.loginForm)
             .then( res => {
               if(res.data.code === 200) {
-                this.$router.push('/home')
+                let target = this.$route.query.redirect
+                this.$router.push(target)
               }
             })
           }
