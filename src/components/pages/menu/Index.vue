@@ -26,7 +26,10 @@
     </el-table-column>
     <el-table-column
       label="状态"
-      prop="status">
+      prop="status"
+      :filter-method="dataFilter"
+      :filters="[ {text: '启用', value: '1'},{text: '禁用', value: '0'}]"
+      >
       <template slot-scope="scope">
         <el-tag :type="scope.row.status == '1'?'success':'danger'">
           {{scope.row.status == '1'?'启用':'禁用'}}
@@ -131,6 +134,9 @@ export default {
         showClose: false,
         duration: 1500
       });
+    },
+    dataFilter(val,row) {
+      return row.status == val
     }
   }
 }

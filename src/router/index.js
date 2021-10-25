@@ -41,6 +41,18 @@ const routes = [
         path: '/role/:id',
         component: () => import('../components/pages/role/Edit.vue')
       },
+      {
+        path: '/admin',
+        component: () => import('../components/pages/admin/Index.vue')
+      },
+      {
+        path: '/admin/add',
+        component: () => import('../components/pages/admin/Edit.vue')
+      },
+      {
+        path: '/admin/:id',
+        component: () => import('../components/pages/admin/Edit.vue')
+      },
     ]
   },
   {

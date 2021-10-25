@@ -2,11 +2,11 @@
   <div class="ms-menu">
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>菜单管理</el-breadcrumb-item>
+      <el-breadcrumb-item>角色管理</el-breadcrumb-item>
     </el-breadcrumb>
     <el-button type="primary" @click="$router.push('/role/add')" style="margin:10px">添加</el-button>
     <el-table
-    :data="roleData.filter(data => !search || data.title.includes(search) || data.icon.toLowerCase().includes(search.toLowerCase()))"
+    :data="roleData.filter(data => !search || data.id.toString().includes(search) || data.rolename.includes(search))"
     style="width: 100%"
     stripe
     row-key="id">
@@ -21,6 +21,8 @@
     </el-table-column>
     <el-table-column
       label="状态"
+      :filter-method="dataFilter"
+      :filters="[ {text: '启用', value: '1'},{text: '禁用', value: '0'}]"
       prop="status">
       <template slot-scope="scope">
         <el-tag :type="scope.row.status == '1'?'success':'danger'">
@@ -61,7 +63,7 @@
 </template>
 
 <script>
-// import { mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 export default {
   name: 'ms-menu',
   data(){
@@ -74,18 +76,15 @@ export default {
   },
   mounted(){
     this.getRoleList()
+    .then( res => {
+      this.roleData = res.data.list
+    }).catch( err => {
+      console.log(err)
+    })
   },
   methods:{
     // 更换为使用Vuex的Store保存内容
-    // ...mapActions(['getRoleList']),
-    getRoleList(){
-        this.$axios.get('/api/rolelist')
-            .then(res => {
-                this.roleData = res.data.list
-            }).catch(err => {
-                console.log(err)
-            })
-    },
+    ...mapActions(['getRoleList']),
 
     handleEdit(index){
       this.$router.push('/role/' + index)
@@ -95,7 +94,7 @@ export default {
       this.$axios
         .post('/api/roledelete',{id:this.id})
         .then(res => {
-          this.getMenuList()
+          this.getRoleList()
           if (res.data.code == 200) {
             this.Notification('success',`删除成功`)
           }
@@ -112,6 +111,9 @@ export default {
         showClose: false,
         duration: 1500
       });
+    },
+    dataFilter(val,row) {
+      return row.status == val
     }
   }
 }

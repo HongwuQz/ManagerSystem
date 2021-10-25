@@ -59,7 +59,7 @@ export default {
         return {
             type:'添加',
             menuList: [],
-            isExtendedable:true,
+            isExtendedable:false,
             defaultProps:{
                 label:"title",
                 children:"children"

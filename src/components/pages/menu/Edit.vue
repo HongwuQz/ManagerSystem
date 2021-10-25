@@ -43,7 +43,7 @@
               inactive-color="red"></el-switch>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="submitForm('ruleForm')">立即{{confirmContent}}</el-button>
+              <el-button type="primary" @click="submitForm('ruleForm')">立即{{type}}</el-button>
               <el-button @click="resetForm('ruleForm')">取消</el-button>
             </el-form-item>
         </el-form>
@@ -64,7 +64,6 @@ export default {
         status: ''    // 状态
       },
       type:'添加',
-      confirmContent: '添加',
       // menuList:[],
       rules: {
         title: [
@@ -90,7 +89,6 @@ export default {
     let id = this.$route.params.id
     if(id){
       this.type = '编辑'
-      this.confirmContent = '编辑'
       this.getMenuInfo(id)
     }
     // this.getMenuList({istree:1})
