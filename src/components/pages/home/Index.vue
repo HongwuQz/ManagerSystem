@@ -5,8 +5,17 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
-    name: 'home'
+  name: 'home',
+  data () {
+    return {
+      
+    }
+  },
+  computed: {
+    ...mapState(['userInfo'])
+  }
 }
 </script>
 

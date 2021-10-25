@@ -7,7 +7,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     menuList: [],
-    roleData: []
+    roleData: [],
+    userInfo: []
   },
   mutations: {
     saveMenuList (state,menuList) {
@@ -18,9 +19,29 @@ export default new Vuex.Store({
     },
     saveUserList (state,userList) {
       state.userList = userList
+    },
+    saveUserInfo (state,userInfo) {
+      state.userInfo = userInfo
     }
   },
   actions: {
+
+    // 用户登录并记录信息
+    getLoginInfo ({commit},params = {}) {
+      return new Promise((resolve,reject) => {
+        axios.post('/api/userlogin',params)
+        .then( res => {
+          if (res.data.code === 200) {
+            commit('saveUserInfo',res.data.list)
+            resolve(res)
+          }
+        }).catch( err => {
+          reject(err)
+        })
+      })
+    },
+
+    // 获得菜单列表
     getMenuList ({commit},params = {} ) {
       return new Promise((resolve,reject) => {
         axios.get('/api/menulist',{params})
@@ -34,6 +55,8 @@ export default new Vuex.Store({
           })
       })
     },
+    
+    // 获取角色列表
     getRoleList ({commit},params = {} ) {
       return new Promise((reslove,reject) => {
         axios.get('/api/rolelist',{params})
@@ -46,6 +69,8 @@ export default new Vuex.Store({
         })
       })
     },
+    
+    // 获取用户列表
     getUserList ({commit},params = {}) {
       return new Promise((resolve,reject) => {
         axios.get('/api/userlist',{params})
