@@ -1,15 +1,15 @@
 <template>
-  <div class="ms-menu">
+  <div class="ms-cate">
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>菜单管理</el-breadcrumb-item>
+      <el-breadcrumb-item>分类管理</el-breadcrumb-item>
     </el-breadcrumb>
-    <el-button type="primary" @click="$router.push('/menu/add')" style="margin:10px">添加</el-button>
+    <el-button type="primary" @click="$router.push('/cate/add')" style="margin:10px">添加</el-button>
     <el-table
-    :data="menuData.filter(data => !search || data.title.includes(search) || data.icon.toLowerCase().includes(search.toLowerCase()))"
+    :data="cateList.filter(data => !search || data.catename.includes(search) || data.catename.toLowerCase().includes(search.toLowerCase()))"
     style="width: 100%"
     stripe
-    row-key="id"
+    :row-key="id"
     :tree-props="{children:'children'}">
     <el-table-column
       label="编号"
@@ -18,11 +18,14 @@
     </el-table-column>
     <el-table-column
       label="名称"
-      prop="title">
+      prop="catename">
     </el-table-column>
     <el-table-column
       label="图标"
-      prop="icon">
+      prop="rolename">
+      <template slot-scope="scoped">
+          <img :src="scoped.row.img" :alt="scoped.row.catename" height="80px">
+      </template>
     </el-table-column>
     <el-table-column
       label="状态"
@@ -35,10 +38,6 @@
           {{scope.row.status == '1'?'启用':'禁用'}}
         </el-tag>
       </template>
-    </el-table-column>
-    <el-table-column
-      label="地址"
-      prop="url">
     </el-table-column>
     <el-table-column
       align="right">
@@ -73,59 +72,60 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 export default {
-  name: 'ms-menu',
+  name: 'ms-cate',
   data(){
     return {
-      menuData:[],
+      cateList:[],
       search:'',
       dialogVisible: false,
       id:''
     }
   },
   mounted(){
-    this.getMenuList({istree:1})
-      .then(res => {
-        this.menuData = res
-      }).catch(err => {
-        console.log(err)
-      })
+    this.getCateList({istree:1})
   },
   methods:{
-    // 更换为使用Vuex的Store保存内容
-    ...mapActions(['getMenuList','getLoginInfo']),
-    // getMenuList(){
-    //   this.$axios
-    //   .get('/api/menulist',{params:{istree:1}})
-    //   .then((res) => {
-    //     this.menuData = res.data.list
-    //   }).catch(err => {
-    //     this.$message({
-    //       type: 'error',
-    //       message: '服务器出错啦',
-    //       showClose: true,
-    //       center: true
-    //     })
-    //   })
-    // },
+    getCateList(){
+      this.$axios
+      .get('/api/catelist',{params:{istree:1}})
+      .then((res,rej) => {
+        console.log(res)
+        if (res.data.code === 200) {
+            this.cateList = res.data.list
+        }else{
+            rej(res)
+        }
+      }).catch(err => {
+        this.$message({
+          type: 'error',
+          message: err,
+          showClose: true,
+          center: true
+        })
+      })
+    },
     handleEdit(index){
-      this.$router.push('/menu/' + index)
+      this.$router.push('/cate/' + index)
     },
     handleDelete(){
       this.dialogVisible = false
       this.$axios
-        .post('/api/menudelete',{id:this.id})
+        .post('/api/catedelete',{id:this.id})
         .then(res => {
-          this.getMenuList({istree:1})
-          .then(res => {
-            this.menuData = res
-          }).catch(err => {
-            console.log(err)
-          })
-          this.getLoginInfo()
+          this.getCateList()
           if (res.data.code == 200) {
             this.Notification('success',`删除成功`)
+            this.getCateList({istree:1})
+            .then((res,rej) => {
+              if(res.data.code == 200) {
+                this.cateData = res.data.list
+              }else{
+                rej(res)
+              }
+            }).catch(err => {
+              console.log(err)
+            })
           }
         }).catch(err => {
           this.$message.error(err)

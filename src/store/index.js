@@ -28,6 +28,7 @@ export default new Vuex.Store({
     },
     userLogout (state) {
       sessionStorage.removeItem('USERINFO')
+      sessionStorage.removeItem('menuList')
       state.userInfo = []
     }
   },
@@ -46,7 +47,6 @@ export default new Vuex.Store({
           .then( res => {
             if (res.data.code === 200) {
               console.log(res)
-              commit('saveUserInfo',res.data.list)
               resolve(res)
             }
           }).catch( err => {
@@ -103,6 +103,19 @@ export default new Vuex.Store({
           reject(err)
         })
       })
-    }
+    },
+
+    // // 获取商品分类管理列表
+    // getCateList ({commit},params = {}) {
+    //   return new Promise((resolve,reject) => {
+    //     axios.get('/api/catelist',{params})
+    //     .then(res => {
+    //       commit('saveCateList',res.data.list)
+    //       resolve(res.data.list)
+    //     }).catch(err => {
+    //       reject(err)
+    //     })
+    //   })
+    // }
   }
 })

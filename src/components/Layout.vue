@@ -12,6 +12,7 @@
                     </span>
                     <el-dropdown-menu>
                     <el-dropdown-item>
+                        <!-- el-dropdown-item标签无法绑定事件 -->
                         <span @click="logout">退出登录</span>
                     </el-dropdown-item>
                     </el-dropdown-menu>
@@ -46,6 +47,10 @@ export default {
 </script>
 
 <style>
+.el-aside{
+    overflow: hidden;
+}
+
 .layout,.el-container{
     height: 100%;
 }

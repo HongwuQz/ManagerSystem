@@ -12,14 +12,14 @@ const router = new VueRouter({
       redirect: '/home',
       meta:{loginAuthRequired: true},
       children:[
+
+        // 主页面路由
         {
           path: '/home',
           component: () => import('../components/pages/home/Index.vue')
         },
-        {
-          path: '/admin',
-          component: () => import('../components/pages/admin/Index.vue')
-        },
+
+        // 菜单管理路由
         {
           path: '/menu',
           component: () => import('../components/pages/menu/Index.vue')
@@ -32,6 +32,8 @@ const router = new VueRouter({
           path: '/menu/:id',
           component: () => import('../components/pages/menu/Edit.vue')
         },
+
+        // 角色管理路由
         {
           path: '/role',
           component: () => import('../components/pages/role/Index.vue')
@@ -44,6 +46,8 @@ const router = new VueRouter({
           path: '/role/:id',
           component: () => import('../components/pages/role/Edit.vue')
         },
+
+        // 用户管理路由
         {
           path: '/user',
           component: () => import('../components/pages/admin/Index.vue')
@@ -56,6 +60,20 @@ const router = new VueRouter({
           path: '/user/:id',
           component: () => import('../components/pages/admin/Edit.vue')
         },
+
+        // 商品分类管理路由
+        {
+          path: '/cate',
+          component: () => import('../components/pages/cate/Index.vue')
+        },
+        {
+          path: '/cate/add',
+          component: () => import('../components/pages/cate/Edit.vue')
+        },
+        {
+          path: '/cate/:id',
+          component: () => import('../components/pages/cate/Edit.vue')
+        },
       ]
     },
     {
@@ -67,7 +85,7 @@ const router = new VueRouter({
 
 // 路由守卫防止XSS攻击
 router.beforeEach( (to,from,next) => {
-  console.log(to)
+
   // 判断会匹配的路由中是否存在需要登陆验证的路由地址
   if (to.matched.some(item => item.meta.loginAuthRequired)){
     
@@ -83,6 +101,7 @@ router.beforeEach( (to,from,next) => {
       })
     }
   }
+  
   // 如果用户的token在缓存中已存在，则直接跳转到home
   if (to.fullPath === '/login') {
     if (sessionStorage.USERINFO && JSON.parse(sessionStorage.USERINFO).token) {
