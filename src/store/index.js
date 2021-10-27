@@ -22,6 +22,8 @@ export default new Vuex.Store({
     },
     saveUserInfo (state,userInfo) {
       state.userInfo = userInfo
+      userInfo = JSON.stringify(userInfo)
+      sessionStorage.setItem('USERINFO',userInfo)
     }
   },
   actions: {
@@ -29,15 +31,22 @@ export default new Vuex.Store({
     // 用户登录并记录信息
     getLoginInfo ({commit},params = {}) {
       return new Promise((resolve,reject) => {
-        axios.post('/api/userlogin',params)
-        .then( res => {
-          if (res.data.code === 200) {
-            commit('saveUserInfo',res.data.list)
-            resolve(res)
-          }
-        }).catch( err => {
-          reject(err)
-        })
+        // 判断浏览器sessionStorage中是否用用户信息缓存
+        if (sessionStorage.USERINFO && JSON.parse(sessionStorage.USERINFO).token) {
+          let userStorage = JSON.parse(sessionStorage.USERINFO)
+          commit('saveUserInfo',userStorage)
+          resolve(userStorage)
+        }else{
+          axios.post('/api/userlogin',params)
+          .then( res => {
+            if (res.data.code === 200) {
+              commit('saveUserInfo',res.data.list)
+              resolve(res)
+            }
+          }).catch( err => {
+            reject(err)
+          })
+        }
       })
     },
 

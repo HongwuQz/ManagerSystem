@@ -45,15 +45,15 @@ const router = new VueRouter({
           component: () => import('../components/pages/role/Edit.vue')
         },
         {
-          path: '/admin',
+          path: '/user',
           component: () => import('../components/pages/admin/Index.vue')
         },
         {
-          path: '/admin/add',
+          path: '/user/add',
           component: () => import('../components/pages/admin/Edit.vue')
         },
         {
-          path: '/admin/:id',
+          path: '/user/:id',
           component: () => import('../components/pages/admin/Edit.vue')
         },
       ]
@@ -67,12 +67,14 @@ const router = new VueRouter({
 
 // 路由守卫防止XSS攻击
 router.beforeEach( (to,from,next) => {
-  console.log(to)
+
   // 判断会匹配的路由中是否存在需要登陆验证的路由地址
   if (to.matched.some(item => item.meta.loginAuthRequired)){
     
     // 如果存在，则判断是否有登陆认证token
-    if(store.state.userInfo.token){
+    store.dispatch('getLoginInfo')
+    let userToken = store.state.userInfo.token
+    if(userToken){
       next()
     }else{
       next({

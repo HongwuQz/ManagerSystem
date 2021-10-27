@@ -4,8 +4,6 @@
       default-active="/home"
       router
       class="el-menu-vertical-demo"
-      @open="handleOpen"
-      @close="handleClose"
       background-color="#545c64"
       text-color="#fff"
       active-text-color="#ffd04b">
@@ -17,38 +15,41 @@
         <i class="el-icon-menu"></i>
         <span slot="title">首 页</span>
       </el-menu-item>
-      <el-submenu index="1">
+      <el-submenu
+      v-for="(m,i) in userInfo.menus"
+      :index="i.toString()"
+      :key="m.id"
+      >
         <template slot="title">
-          <i class="el-icon-location"></i>
-          <span>系统设置</span>
+          <i :class="m.icon"></i>
+          <span>{{m.title}}</span>
         </template>
-        <el-menu-item index="/menu">
+        <el-menu-item
+        v-for="(cm) in m.children"
+        :index="cm.url"
+        :key="cm.id">
           <i class="el-icon-location"></i>
-          <span>菜单管理</span>
+          <span>{{cm.title}}</span>
         </el-menu-item>
-        <el-menu-item index="/role">
+        <!-- <el-menu-item index="/role">
           <i class="el-icon-location"></i>
           <span>角色管理</span>
         </el-menu-item>
         <el-menu-item index="/admin">
           <i class="el-icon-location"></i>
           <span>管理员管理</span>
-        </el-menu-item>
+        </el-menu-item> -->
       </el-submenu>
     </el-menu>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
     name: 'navmenu',
-    methods: {
-      handleOpen(key, keyPath) {
-        // console.log(key, keyPath);
-      },
-      handleClose(key, keyPath) {
-        // console.log(key, keyPath);
-      }
+    computed: {
+      ...mapState(['userInfo'])
     }
 }
 </script>

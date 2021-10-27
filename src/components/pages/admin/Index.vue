@@ -4,7 +4,7 @@
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>管理员管理</el-breadcrumb-item>
     </el-breadcrumb>
-    <el-button type="primary" @click="$router.push('/admin/add')" style="margin:10px">添加</el-button>
+    <el-button type="primary" @click="$router.push('/user/add')" style="margin:10px">添加</el-button>
     <el-table
     :data="userData.filter(data => !search || data.rolename.includes(search) || data.username.toLowerCase().includes(search.toLowerCase()))"
     style="width: 100%"
@@ -110,7 +110,7 @@ export default {
     //   })
     // },
     handleEdit(index){
-      this.$router.push('/admin/' + index)
+      this.$router.push('/user/' + index)
     },
     handleDelete(){
       this.dialogVisible = false

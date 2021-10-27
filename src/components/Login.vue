@@ -46,8 +46,9 @@ export default {
           if(valid) {
             this.getLoginInfo(this.loginForm)
             .then( res => {
-              if(res.data.code === 200) {
+              if(res.token || res.data.code === 200) {
                 let target = this.$route.query.redirect
+                if(!target) target = '/home'
                 this.$router.push(target)
               }
             })
