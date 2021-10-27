@@ -72,6 +72,7 @@
 </template>
 
 <script>
+import { mapState,mapActions } from 'vuex'
 export default {
   name: 'ms-cate',
   data(){
@@ -84,27 +85,34 @@ export default {
   },
   mounted(){
     this.getCateList({istree:1})
+    .then( res => {
+      this.cateList = res
+    }).catch(err => {
+      console.log(err)
+    })
   },
   methods:{
-    getCateList(){
-      this.$axios
-      .get('/api/catelist',{params:{istree:1}})
-      .then((res,rej) => {
-        console.log(res)
-        if (res.data.code === 200) {
-            this.cateList = res.data.list
-        }else{
-            rej(res)
-        }
-      }).catch(err => {
-        this.$message({
-          type: 'error',
-          message: err,
-          showClose: true,
-          center: true
-        })
-      })
-    },
+    // 转变为Vuex内的getCateList函数进行获取，并存储在State中供编辑页使用
+    ...mapState(['cateList']),
+    ...mapActions(['getCateList']),
+    // getCateList(){
+    //   this.$axios
+    //   .get('/api/catelist',{params:{istree:1}})
+    //   .then((res,rej) => {
+    //     if (res.data.code === 200) {
+    //         this.cateList = res.data.list
+    //     }else{
+    //         rej(res)
+    //     }
+    //   }).catch(err => {
+    //     this.$message({
+    //       type: 'error',
+    //       message: err,
+    //       showClose: true,
+    //       center: true
+    //     })
+    //   })
+    // },
     handleEdit(index){
       this.$router.push('/cate/' + index)
     },

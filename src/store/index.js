@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     menuList: [],
     roleData: [],
-    userInfo: []
+    userInfo: [],
+    cateList: []
   },
   mutations: {
     saveMenuList (state,menuList) {
@@ -26,6 +27,9 @@ export default new Vuex.Store({
       userInfo = JSON.stringify(userInfo)
       sessionStorage.setItem('USERINFO',userInfo)
     },
+    saveCateList (state,cateList) {
+      state.cateList = cateList
+    },
     userLogout (state) {
       sessionStorage.removeItem('USERINFO')
       sessionStorage.removeItem('menuList')
@@ -38,7 +42,7 @@ export default new Vuex.Store({
     getLoginInfo ({commit},params = {}) {
       return new Promise((resolve,reject) => {
         // 判断浏览器sessionStorage中是否存在用户信息缓存，有则优先从缓存获取
-        if (sessionStorage.USERINFO && JSON.parse(sessionStorage.USERINFO).token) {
+        if (sessionStorage.USERINFO) {
           let userStorage = JSON.parse(sessionStorage.USERINFO)
           commit('saveUserInfo',userStorage)
           resolve(userStorage)
@@ -46,7 +50,7 @@ export default new Vuex.Store({
           axios.post('/api/userlogin',params)
           .then( res => {
             if (res.data.code === 200) {
-              console.log(res)
+              commit('saveUserInfo',res.data.list)
               resolve(res)
             }
           }).catch( err => {
@@ -105,17 +109,17 @@ export default new Vuex.Store({
       })
     },
 
-    // // 获取商品分类管理列表
-    // getCateList ({commit},params = {}) {
-    //   return new Promise((resolve,reject) => {
-    //     axios.get('/api/catelist',{params})
-    //     .then(res => {
-    //       commit('saveCateList',res.data.list)
-    //       resolve(res.data.list)
-    //     }).catch(err => {
-    //       reject(err)
-    //     })
-    //   })
-    // }
+    // 获取商品分类管理列表
+    getCateList ({commit},params = {}) {
+      return new Promise((resolve,reject) => {
+        axios.get('/api/catelist',{params})
+        .then(res => {
+          commit('saveCateList',res.data.list)
+          resolve(res.data.list)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    }
   }
 })
