@@ -84,7 +84,7 @@ export default {
         }
         this.getMenuList({istree:1})
         .then(res => {
-            this.menuList = res.data.list
+            this.menuList = res
         }).catch(err => {
             console.log(err)
         })

@@ -87,7 +87,7 @@ export default {
   mounted(){
     this.getMenuList({istree:1})
       .then(res => {
-        this.menuData = res.data.list
+        this.menuData = res
       }).catch(err => {
         console.log(err)
       })

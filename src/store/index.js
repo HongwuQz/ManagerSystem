@@ -13,6 +13,7 @@ export default new Vuex.Store({
   mutations: {
     saveMenuList (state,menuList) {
       state.menuList = menuList
+      sessionStorage.setItem("menuList",JSON.stringify(menuList))
     },
     saveRoleList (state,roleData) {
       state.roleData = roleData
@@ -24,6 +25,10 @@ export default new Vuex.Store({
       state.userInfo = userInfo
       userInfo = JSON.stringify(userInfo)
       sessionStorage.setItem('USERINFO',userInfo)
+    },
+    userLogout (state) {
+      sessionStorage.removeItem('USERINFO')
+      state.userInfo = []
     }
   },
   actions: {
@@ -31,7 +36,7 @@ export default new Vuex.Store({
     // 用户登录并记录信息
     getLoginInfo ({commit},params = {}) {
       return new Promise((resolve,reject) => {
-        // 判断浏览器sessionStorage中是否用用户信息缓存
+        // 判断浏览器sessionStorage中是否存在用户信息缓存，有则优先从缓存获取
         if (sessionStorage.USERINFO && JSON.parse(sessionStorage.USERINFO).token) {
           let userStorage = JSON.parse(sessionStorage.USERINFO)
           commit('saveUserInfo',userStorage)
@@ -40,6 +45,7 @@ export default new Vuex.Store({
           axios.post('/api/userlogin',params)
           .then( res => {
             if (res.data.code === 200) {
+              console.log(res)
               commit('saveUserInfo',res.data.list)
               resolve(res)
             }
@@ -53,15 +59,22 @@ export default new Vuex.Store({
     // 获得菜单列表
     getMenuList ({commit},params = {} ) {
       return new Promise((resolve,reject) => {
-        axios.get('/api/menulist',{params})
+        // // 判断浏览器sessionStorage中是否存在列表数据:会出现新增权限无法获取的bug（舍）
+        // if (sessionStorage.menuList) {
+        //   let menuStorage = JSON.parse(sessionStorage.menuList)
+        //   commit('saveMenuList',menuStorage)
+        //   resolve(menuStorage)
+        // }else{
+          axios.get('/api/menulist',{params})
           .then(res => {
             commit('saveMenuList',res.data.list)
-            resolve(res)
+            resolve(res.data.list)
             // console.log(res)
           })
           .catch(err => {
             reject(err)
           })
+        // }
       })
     },
     
