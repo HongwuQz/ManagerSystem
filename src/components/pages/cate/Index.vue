@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { mapState,mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 export default {
   name: 'ms-cate',
   data(){
@@ -93,7 +93,6 @@ export default {
   },
   methods:{
     // 转变为Vuex内的getCateList函数进行获取，并存储在State中供编辑页使用
-    ...mapState(['cateList']),
     ...mapActions(['getCateList']),
     // getCateList(){
     //   this.$axios

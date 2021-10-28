@@ -22,16 +22,19 @@
               :value="m.id"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="商品图片">
+            <el-form-item label="商品图片" style="width:600px" prop="img">
                 <el-upload
-                class="img-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :show-file-list="false"
-                :on-success="handleImgSuccess"
-                :before-upload="beforeImgUpload">
-                    <img v-if="ruleForm.img" :src="ruleForm.img" class="img">
-                    <i v-else class="el-icon-plus img-uploader-icon"></i>
+                  v-show="!file"
+                  action="#"
+                  list-type="picture-card"
+                  :on-change="handleChange"
+                  :auto-upload="false"
+                  >
+                  <i class="el-icon-plus"></i>
                 </el-upload>
+                <el-dialog :visible.sync="dialogVisible">
+                  <img width="100%" :src="dialogImageUrl" alt="">
+                </el-dialog>
             </el-form-item>
             <el-form-item label="状态" prop="status">
               <el-switch
@@ -50,7 +53,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState,mapActions } from 'vuex'
 export default {
   data() {
     return {
@@ -60,8 +63,13 @@ export default {
         img: '',        // 图片(文件，一般用于二级分类)
         status: ''      // 状态
       },
+      // 添加页面类型  1：添加（默认）  2：编辑
       type:'添加',
       // menuList:[],
+      // 图片详情设置
+      dialogVisible: false,
+      dialogImageUrl: '',
+      file:false,
       rules: {
         catename: [
           { required: true, message: '请输入菜单名称', trigger: 'blur' }
@@ -81,7 +89,7 @@ export default {
       this.type = '编辑'
       this.getCateInfo(id)
     }
-    console.log(this.cateList)
+    this.getCateList()
   },
   computed: {
     ...mapState(['cateList'])
@@ -110,6 +118,8 @@ export default {
       }
       });
     },
+
+    ...mapActions(['getCateList']),
 
     // 提示框
     Notification (type,title) {
@@ -144,22 +154,15 @@ export default {
     },
     
     // 图片获取相关函数
-    handleImgSuccess(res, file) {
-        console.log(res,file)
-        this.imageUrl = URL.createObjectURL(file.raw);
-    },
-    beforeImgUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-
-        if (!isJPG) {
-            this.$message.error('上传头像图片只能是 JPG 格式!');
-        }
-        if (!isLt2M) {
-            this.$message.error('上传头像图片大小不能超过 2MB!');
-        }
-        return isJPG && isLt2M;
-        }
+    handleChange (file,fileList) {
+      console.log(!fileList)
+      this.file = !!fileList
+      if (!this.file) {
+        console.log('只能上传一个文件')
+      }
+      console.log(!this.file)
+      console.log(this.file)
+    }
   },
 }
 </script>
