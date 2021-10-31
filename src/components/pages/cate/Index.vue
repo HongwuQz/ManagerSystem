@@ -9,7 +9,7 @@
     :data="cateList.filter(data => !search || data.catename.includes(search) || data.catename.toLowerCase().includes(search.toLowerCase()))"
     style="width: 100%"
     stripe
-    :row-key="id"
+    row-key="id"
     :tree-props="{children:'children'}">
     <el-table-column
       label="编号"

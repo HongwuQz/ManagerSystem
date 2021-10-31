@@ -23,14 +23,16 @@
               </el-select>
             </el-form-item>
             <el-form-item label="商品图片" style="width:600px" prop="img">
+              <!-- 这里希望v-show能够只隐藏上传页面，但由于elementUI生成的是ul列表，现在实现不了 -->
                 <el-upload
-                  v-show="!file"
+                  v-show="true"
                   action="#"
                   list-type="picture-card"
                   :on-change="handleChange"
                   :auto-upload="false"
                   >
                   <i class="el-icon-plus"></i>
+                  <!-- <i class="imgWarning">请上传图片</i> -->
                 </el-upload>
                 <el-dialog :visible.sync="dialogVisible">
                   <img width="100%" :src="dialogImageUrl" alt="">
@@ -60,9 +62,11 @@ export default {
       ruleForm: {
         pid: '',        // 上级分类编号
         catename: '',   // 商品分类名称
-        img: '',        // 图片(文件，一般用于二级分类)
         status: ''      // 状态
       },
+      // 图片(文件，一般用于二级分类)
+      // 由于formData序列化会导致文件变为[Object]，单独拿出来提交
+      img: '',
       // 添加页面类型  1：添加（默认）  2：编辑
       type:'添加',
       // menuList:[],
@@ -77,9 +81,9 @@ export default {
         pid: [
           { required: true, message: '请选择上级菜单', trigger: 'change' }
         ],
-        img: [
-          { required: true, message: '请选择图片', trigger: 'change' }
-        ]
+        // img: [
+        //   { required: true, message: '请选择图片' }
+        // ]
       }
     };
   },
@@ -95,7 +99,7 @@ export default {
     ...mapState(['cateList'])
   },
   methods: {
-    submitForm(formName) {
+    submitForm (formName) {
       this.$refs[formName].validate((valid) => {
       if (valid) {
         let str = JSON.stringify(this.ruleForm)
@@ -105,8 +109,17 @@ export default {
             url = '/api/cateedit'
             params.id = this.$route.params.id
         }
-        console.log(url,params)
-        this.$axios.post(url,{params})
+
+        // 将form转化为FormData格式(因为需要携带文件)
+        let formData = new FormData()
+        for (let key in params) {
+          console.log(key,params[key])
+          formData.append(key,params[key])
+        }
+        formData.append('img',this.img)
+
+        console.log(url,formData)
+        this.$axios.post(url,formData)
         .then(res => {
             console.log(res)
         }).catch(err => {
@@ -154,14 +167,8 @@ export default {
     },
     
     // 图片获取相关函数
-    handleChange (file,fileList) {
-      console.log(!fileList)
-      this.file = !!fileList
-      if (!this.file) {
-        console.log('只能上传一个文件')
-      }
-      console.log(!this.file)
-      console.log(this.file)
+    handleChange (file) {
+      this.img = file.raw
     }
   },
 }
@@ -169,30 +176,31 @@ export default {
 
 <style>
 .demo-ruleForm{
-    width: 400px;
+  width: 400px;
 }
 
 .img-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 .img-uploader .el-upload:hover {
-    border-color: #409EFF;
+  border-color: #409EFF;
 }
 .img-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
 }
 .img {
-    width: 178px;
-    height: 178px;
-    display: block;
+  width: 178px;
+  height: 178px;
+  display: block;
 }
+
 </style>
