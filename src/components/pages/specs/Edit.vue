@@ -1,28 +1,32 @@
 <template>
-    <div class="addForm">
+    <div class="addForm" v-cloak>
         <!-- 面包屑导航 -->
         <el-breadcrumb separator-class="el-icon-arrow-right" style="margin-bottom:10px">
             <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-            <el-breadcrumb-item :to="{ path: '/menu' }">规格管理</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/specs' }">规格管理</el-breadcrumb-item>
             <el-breadcrumb-item style="margin-bottom:10px">规格{{type}}</el-breadcrumb-item>
         </el-breadcrumb>
         <!-- 添加/修改表单 -->
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="名称" prop="username">
-                <el-input v-model="ruleForm.username"></el-input>
+            <el-form-item label="规格名称" prop="specsname">
+                <el-input v-model="ruleForm.specsname"></el-input>
             </el-form-item>
-            <el-form-item label="所属角色" prop="roleid">
-              <el-select v-model="ruleForm.roleid" placeholder="请选择角色">
-              <!-- 过滤掉自身（顶级菜单） -->
-              <el-option
-              v-for="r in roleList.filter(item => item.rolename != ruleForm.rolename)"
-              :key="r.id"
-              :label="r.rolename"
-              :value="r.id"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="密码" prop="password">
-                <el-input show-password v-model="ruleForm.password"></el-input>
+            <el-form-item label="规格属性" prop="attrs">
+              <template :slot-scope="attrs">
+                <div v-for="(item,i) in attrs" :key="i">
+                <el-input
+                style="width:80%"
+                v-model="item.value"
+                ></el-input>
+                <el-button
+                class="delBt"
+                icon="el-icon-delete"
+                circle
+                @click="attrs.pop()"></el-button>
+              </div>
+              </template>
+
+              <el-button @click="attrs.push({value:''})">添加规格</el-button>
             </el-form-item>
             <el-form-item label="状态" prop="status">
               <el-switch
@@ -41,17 +45,14 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 export default {
   data() {
     return {
       ruleForm: {
-        username: '',
-        roleid: '',
-        password: '',
+        specsname: '',
         status: false    // 状态
       },
-      roleList: [],
+      attrs: [{value:''}],
       type:'添加',
       rules: {
         username: [
@@ -73,14 +74,8 @@ export default {
     // console.log(id)
     if(id){
       this.type = '编辑'
-      this.getUserInfo(id)
+      this.getSpecsInfo(id)
     }
-    this.getRoleList()
-    // console.log(this.roleList)
-    // console.log(this.menuList)
-  },
-  computed: {
-    ...mapState(['menuList'])
   },
   methods: {
     submitForm(formName) {
@@ -88,16 +83,18 @@ export default {
       if (valid) {
         let str = JSON.stringify(this.ruleForm)
         let params = JSON.parse(str)
-        let url = '/api/useradd'
+        let url = '/api/specsadd'
         if(this.type == '编辑') {
-            url = '/api/useredit'
-            params.uid = this.$route.params.id
+            url = '/api/specsedit'
+            params.id = this.$route.params.id
         }
-        // console.log(params)
+        
+        console.log(params)
         this.$axios.post(url,params)
         .then(res => {
           if (res.data.code == 200) {
             this.Notification('success',`${this.type}成功`)
+            console.log(res)
           }
           this.$router.go(-1)
         }).catch(err =>{
@@ -123,25 +120,20 @@ export default {
         duration: 1500
       });
     },
-    getRoleList () {
-        this.$axios.get('/api/rolelist')
-        .then( res => {
-            this.roleList = res.data.list
-        }).catch( err => {
-            console.log(err)
-        })
-    },
     // 获取单条菜单信息
-    getUserInfo(id){
+    getSpecsInfo(id){
       this.$axios
-        .get('/api/userinfo',{params:{uid:id}})
+        .get('/api/specsinfo',{params:{id}})
         .then((res) => {
-          this.ruleForm = res.data.list
+          this.ruleForm = res.data.list[0]
+          res.data.list[0].attrs.map(item => {
+            this.attrs.push({value:item})
+          })
+          console.log(this.attrs);
         }).catch(err => {
           this.$message({
           type: 'error',
-          message: `服务器出错啦
-          错误码：${err}`,
+          message: err,
           showClose: true,
           center: true
           })
@@ -158,5 +150,11 @@ export default {
 <style>
     .demo-ruleForm{
       width: 400px;
+    }
+    .delBt{
+      margin-left: 10px;
+      border: none;
+      color: red;
+      display: inline-block;
     }
 </style>

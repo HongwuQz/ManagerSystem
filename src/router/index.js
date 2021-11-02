@@ -74,6 +74,18 @@ const router = new VueRouter({
           path: '/cate/:id',
           component: () => import('../components/pages/cate/Edit.vue')
         },
+        {
+          path: '/specs',
+          component: () => import('../components/pages/specs/Index.vue')
+        },
+        {
+          path: '/specs/add',
+          component: () => import('../components/pages/specs/Edit.vue')
+        },
+        {
+          path: '/specs/:id',
+          component: () => import('../components/pages/specs/Edit.vue')
+        },
       ]
     },
     {

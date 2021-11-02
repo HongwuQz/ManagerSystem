@@ -1,12 +1,12 @@
 <template>
-  <div class="ms-user">
+  <div class="ms-specs">
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>管理员管理</el-breadcrumb-item>
+      <el-breadcrumb-item>规格管理</el-breadcrumb-item>
     </el-breadcrumb>
-    <el-button type="primary" @click="$router.push('/user/add')" style="margin:10px">添加</el-button>
+    <el-button type="primary" @click="$router.push('/specs/add')" style="margin:10px">添加</el-button>
     <el-table
-    :data="userData.filter(data => !search || data.rolename.includes(search) || data.username.toLowerCase().includes(search.toLowerCase()))"
+    :data="specsData.filter(data => !search || data.specsname.includes(search) || data.specsname.toLowerCase().includes(search.toLowerCase()))"
     style="width: 100%"
     stripe
     row-key="id"
@@ -18,17 +18,28 @@
     </el-table-column>
     <el-table-column
       label="名称"
-      prop="username">
+      prop="specsname"
+      width="100px">
     </el-table-column>
     <el-table-column
-      label="角色"
-      prop="rolename">
+      label="规格属性"
+      prop="attrs"
+      >
+      <template slot-scope="scoped">
+        <el-tag
+        v-for="(item,key) in scoped.row.attrs"
+        :key="key"
+        >
+          {{item}}
+        </el-tag>
+      </template>
     </el-table-column>
     <el-table-column
       label="状态"
       prop="status"
+      width="100px"
       :filter-method="dataFilter"
-      :filters="[ {text: '启用', value: '1'},{text: '禁用', value: '0'}]"
+      :filters="[{text: '启用', value: '1'},{text: '禁用', value: '0'}]"
       >
       <template slot-scope="scope">
         <el-tag :type="scope.row.status == '1'?'success':'danger'">
@@ -47,7 +58,7 @@
       <template slot-scope="scope">
         <el-button
           size="mini"
-          @click="handleEdit(scope.row.uid)">编辑</el-button>
+          @click="handleEdit(scope.row.id)">编辑</el-button>
         <el-button
           size="mini"
           type="danger"
@@ -71,62 +82,42 @@
 <script>
 import { mapActions } from 'vuex'
 export default {
-  name: 'ms-user',
+  name: 'ms-specs',
   data(){
     return {
-      userData:[],
-      search:'',
+      specsData: [],
+      search: '',
       dialogVisible: false,
-      id:''
+      id: ''
     }
   },
   mounted(){
-    this.getUserList({size:10, page:1})
-      .then((res,rej) => {
-        if(res.data.code == 200) {
-          this.userData = res.data.list
-        }else{
-          rej(res)
-        }
+    this.getSpecsList({size:10, page:1})
+      .then((res) => {
+        this.specsData = res
+        console.log(res)
       }).catch(err => {
         console.log(err)
       })
   },
   methods:{
-    // 更换为使用Vuex的Store保存内容
-    ...mapActions(['getUserList']),
-    // getMenuList(){
-    //   this.$axios
-    //   .get('/api/menulist',{params:{istree:1}})
-    //   .then((res) => {
-    //     this.menuData = res.data.list
-    //   }).catch(err => {
-    //     this.$message({
-    //       type: 'error',
-    //       message: '服务器出错啦',
-    //       showClose: true,
-    //       center: true
-    //     })
-    //   })
-    // },
+    // 使用Vuex的Store保存内容
+    ...mapActions(['getSpecsList']),
+
     handleEdit(index){
-      this.$router.push('/user/' + index)
+      this.$router.push('/specs/' + index)
     },
     handleDelete(){
       this.dialogVisible = false
       this.$axios
-        .post('/api/userdelete',{id:this.id})
+        .post('/api/specsdelete',{id:this.id})
         .then(res => {
-          this.getUserList()
+          this.getSpecsList()
           if (res.data.code == 200) {
             this.Notification('success',`删除成功`)
-            this.getUserList({size:10, page:1})
+            this.getSpecsList({size:10, page:1})
             .then((res,rej) => {
-              if(res.data.code == 200) {
-                this.userData = res.data.list
-              }else{
-                rej(res)
-              }
+              res.data.code == 200 ? this.specsData = res.data.list : rej(res)
             }).catch(err => {
               console.log(err)
             })
