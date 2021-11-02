@@ -95,7 +95,7 @@ export default {
     this.getSpecsList({size:10, page:1})
       .then((res) => {
         this.specsData = res
-        console.log(res)
+        // console.log(res)
       }).catch(err => {
         console.log(err)
       })
@@ -116,8 +116,8 @@ export default {
           if (res.data.code == 200) {
             this.Notification('success',`删除成功`)
             this.getSpecsList({size:10, page:1})
-            .then((res,rej) => {
-              res.data.code == 200 ? this.specsData = res.data.list : rej(res)
+            .then(res => {
+              this.specsData = res
             }).catch(err => {
               console.log(err)
             })

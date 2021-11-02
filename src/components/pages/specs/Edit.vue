@@ -71,7 +71,6 @@ export default {
   },
   mounted(){
     let id = this.$route.params.id
-    // console.log(id)
     if(id){
       this.type = '编辑'
       this.getSpecsInfo(id)
@@ -88,13 +87,12 @@ export default {
             url = '/api/specsedit'
             params.id = this.$route.params.id
         }
-        
-        console.log(params)
+        params.attrs = this.attrs.map(item => item.value).toString()
+        // console.log(params)
         this.$axios.post(url,params)
         .then(res => {
           if (res.data.code == 200) {
             this.Notification('success',`${this.type}成功`)
-            console.log(res)
           }
           this.$router.go(-1)
         }).catch(err =>{
