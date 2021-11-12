@@ -10,7 +10,8 @@ export default new Vuex.Store({
     roleData: [],
     userInfo: [],
     cateList: [],
-    specsList: []
+    specsList: [],
+    goodsList: []
   },
   mutations: {
     saveMenuList (state,menuList) {
@@ -33,6 +34,9 @@ export default new Vuex.Store({
     },
     saveSpecsList (state,specsList) {
       state.specsList = specsList
+    },
+    saveGoodsList (state,goodsList) {
+      state.goodsList = goodsList
     },
     userLogout (state) {
       sessionStorage.removeItem('USERINFO')
@@ -141,6 +145,23 @@ export default new Vuex.Store({
           reject(err)
         });
       })
-    }
+    },
+
+    // 获取商品列表
+    getGoodsList ({commit},params = {}) {
+      return new Promise((resolve,reject) => {
+        axios.get('/api/goodslist',{params})
+        .then(res => {
+          if(res.data.code == 200){
+            commit('saveGoodsList',res.data.list)
+            resolve(res.data.list)
+          }else{
+            reject(res)
+          }
+        }).catch(err => {
+          reject(err)
+        });
+      })
+    },
   }
 })

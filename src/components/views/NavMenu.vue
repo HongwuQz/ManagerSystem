@@ -47,10 +47,10 @@
 <script>
 import { mapState } from 'vuex'
 export default {
-    name: 'navmenu',
-    computed: {
-      ...mapState(['userInfo'])
-    }
+  name: 'navmenu',
+  computed: {
+    ...mapState(['userInfo'])
+  }
 }
 </script>
 

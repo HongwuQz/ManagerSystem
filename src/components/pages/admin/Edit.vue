@@ -43,16 +43,16 @@
 <script>
 import { mapState } from 'vuex'
 export default {
-  data() {
+  data () {
     return {
       ruleForm: {
         username: '',
         roleid: '',
         password: '',
-        status: false    // 状态
+        status: false // 状态
       },
       roleList: [],
-      type:'添加',
+      type: '添加',
       rules: {
         username: [
           { required: true, message: '请输入管理员名称', trigger: 'blur' },
@@ -64,14 +64,14 @@ export default {
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 3, max: 32, message: '长度在 3 到 32 个字符', trigger: 'blur' }
-        ],
+        ]
       }
-    };
+    }
   },
-  mounted(){
-    let id = this.$route.params.id
+  mounted () {
+    const id = this.$route.params.id
     // console.log(id)
-    if(id){
+    if (id) {
       this.type = '编辑'
       this.getUserInfo(id)
     }
@@ -83,75 +83,75 @@ export default {
     ...mapState(['menuList'])
   },
   methods: {
-    submitForm(formName) {
+    submitForm (formName) {
       this.$refs[formName].validate((valid) => {
-      if (valid) {
-        let str = JSON.stringify(this.ruleForm)
-        let params = JSON.parse(str)
-        let url = '/api/useradd'
-        if(this.type == '编辑') {
+        if (valid) {
+          const str = JSON.stringify(this.ruleForm)
+          const params = JSON.parse(str)
+          let url = '/api/useradd'
+          if (this.type == '编辑') {
             url = '/api/useredit'
             params.uid = this.$route.params.id
-        }
-        // console.log(params)
-        this.$axios.post(url,params)
-        .then(res => {
-          if (res.data.code == 200) {
-            this.Notification('success',`${this.type}成功`)
           }
-          this.$router.go(-1)
-        }).catch(err =>{
-          console.log(err)
-        })
-      } else {
-        this.$message({
+          // console.log(params)
+          this.$axios.post(url, params)
+            .then(res => {
+              if (res.data.code == 200) {
+                this.Notification('success', `${this.type}成功`)
+              }
+              this.$router.go(-1)
+            }).catch(err => {
+              console.log(err)
+            })
+        } else {
+          this.$message({
             type: 'error',
             message: '提交内容有误请检查！！',
             duration: 1500
-        })
-        return false;
-      }
-      });
+          })
+          return false
+        }
+      })
     },
     // 提示框
-    Notification (type,title) {
+    Notification (type, title) {
       this.$notify({
         title: title,
         type: type,
         offset: 100,
         showClose: false,
         duration: 1500
-      });
+      })
     },
     getRoleList () {
-        this.$axios.get('/api/rolelist')
-        .then( res => {
-            this.roleList = res.data.list
-        }).catch( err => {
-            console.log(err)
+      this.$axios.get('/api/rolelist')
+        .then(res => {
+          this.roleList = res.data.list
+        }).catch(err => {
+          console.log(err)
         })
     },
     // 获取单条菜单信息
-    getUserInfo(id){
+    getUserInfo (id) {
       this.$axios
-        .get('/api/userinfo',{params:{uid:id}})
+        .get('/api/userinfo', { params: { uid: id } })
         .then((res) => {
           this.ruleForm = res.data.list
         }).catch(err => {
           this.$message({
-          type: 'error',
-          message: `服务器出错啦
+            type: 'error',
+            message: `服务器出错啦
           错误码：${err}`,
-          showClose: true,
-          center: true
+            showClose: true,
+            center: true
           })
         })
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    resetForm (formName) {
+      this.$refs[formName].resetFields()
       this.$router.go(-1)
     }
-  },
+  }
 }
 </script>
 
